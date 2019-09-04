@@ -95,19 +95,18 @@ def DD_anly(
     """
     #create path
     pathlib.Path(save_dir).mkdir(parents=True,exist_ok=True)
-    c = j / np.sqrt(4 * np.pi * D * t) * np.exp(- (x-source)**2 / (4 * D * t) - m*t)
+    c = j / np.sqrt(4 * np.pi * D * t) * np.exp(-(x-source)**2 / (4 * D * t) - m*t)
     np.save(os.path.join(save_dir,"x_analy"),x)
     np.save(os.path.join(save_dir,"y_analy"),c)
     return c
 
 def randomised_trials(num_trials, save_dir):
+    
     """
         num_trials (int): number of trials to initialise parameters of PDEs
         save_dir (string): parent node of the ith file folder which will store simulated for the ith number of trial.
 
     """
-    mu_lower = 1/(45*600)
-    mu_upper = 0.0005
     #dtsave = 0.001 #set this constants
     for i in range(num_trials):
         #let ith dir to store data be save_dir + str(i+1
@@ -154,9 +153,15 @@ def randomised_trials(num_trials, save_dir):
                 save_dir=ith_save_dir
                 ) #set dtsave as dt
 
-        DD_anly(x=xx, t=Total_sim_time, source=source, D=Diff_coeff, 
+        #DD_anly(x=xx, t=Total_sim_time, source=source, D=Diff_coeff, 
+        #        m=decay_coeff, j=init_conc,
+        #        save_dir=ith_save_dir)
+
+        #attempt to fix bug
+        DD_anly(x=xx, t=Total_sim_time, source=xx[source], D=Diff_coeff, 
                 m=decay_coeff, j=init_conc,
                 save_dir=ith_save_dir)
+
      
 if __name__ == "__main__":
     my_parser = argparse.ArgumentParser(description="programme to randomised parameter values of PDEs to generate simulated data")
