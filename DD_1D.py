@@ -5,7 +5,7 @@ import random
 import argparse
 
 def DD_numr(
-            D, mu, init, source, 
+            D, mu, init, source_position, 
             Lx, Ttotal, dtsave, dx, 
             dt, save_dir
             ):
@@ -79,13 +79,13 @@ def DD_numr(
     return x, s, u
 
 def DD_anly(
-            x, t, source, D, 
+            x, t, source_value, D, 
             m, j, save_dir):
 
     """
         x (np arr): positional data
         t (int): total simulation time in seconds
-        source (int): x position of source
+        source_value (float): value of xx array at the position as indicated by source_position (from numerical method)
         D (int):    diffusion coeff
         m (int): decay coeff
         j (int): initial bicoid concentration
@@ -95,7 +95,7 @@ def DD_anly(
     """
     #create path
     pathlib.Path(save_dir).mkdir(parents=True,exist_ok=True)
-    c = j / np.sqrt(4 * np.pi * D * t) * np.exp(-(x-source)**2 / (4 * D * t) - m*t)
+    c = j / np.sqrt(4 * np.pi * D * t) * np.exp(-(x-source_value)**2 / (4 * D * t) - m*t)
     np.save(os.path.join(save_dir,"x_analy"),x)
     np.save(os.path.join(save_dir,"y_analy"),c)
     return c
@@ -117,7 +117,7 @@ def randomised_trials(num_trials, save_dir):
         f = open(file_name, "w+")
 
         #first, let's randomised parameters shared by DD_numr and DD_anly
-        Diff_coeff = random.randint(3,10) #[a,b], Diff_coeff = D
+        Diff_coeff = 3 #[a,b], Diff_coeff = D
         #decay_coeff = random.uniform(mu_lower, mu_upper) #[a,b], decay_coeff = mu
         decay_coeff = 0 
         #init_conc = init
@@ -125,11 +125,11 @@ def randomised_trials(num_trials, save_dir):
         #Total_sim_time = Ttotal; means total simulation time #time is in seconds 
         Total_sim_time = 10        
         #randomised dx, Lx, source, dt
-        dx = random.uniform(1,2)
+        dx = 1.01
         #Lx = random.randint(30,40)
         Lx = 30
-        dt = random.uniform(0.001, (dx)**2/Diff_coeff)
-        source = random.randint(0,round(Lx/dx)-2) #need to be within round(Lx/dx)-2
+        dt = 0.001
+        source = round((Lx/dx)/2) #is the positional value of an array
         #create xx for DD_anly
         xx = np.arange(0, round(Lx/dx)+1)*dx
         
@@ -148,7 +148,7 @@ def randomised_trials(num_trials, save_dir):
         f.close()
 
         DD_numr(D=Diff_coeff, mu=decay_coeff, init=init_conc, 
-                source=source, Lx=Lx, Ttotal=Total_sim_time, 
+                source_position=source, Lx=Lx, Ttotal=Total_sim_time, 
                 dtsave= dt, dx=dx, dt=dt, 
                 save_dir=ith_save_dir
                 ) #set dtsave as dt
@@ -158,7 +158,7 @@ def randomised_trials(num_trials, save_dir):
         #        save_dir=ith_save_dir)
 
         #attempt to fix bug
-        DD_anly(x=xx, t=Total_sim_time, source=xx[source], D=Diff_coeff, 
+        DD_anly(x=xx, t=Total_sim_time, source_value=xx[source], D=Diff_coeff, 
                 m=decay_coeff, j=init_conc,
                 save_dir=ith_save_dir)
 
