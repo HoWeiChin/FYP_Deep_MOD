@@ -14,7 +14,7 @@ def DD_numr(
         D (float): diffusion coefficient
         mu (float): decay coefficient
         init (float): initial bicoid concentration
-        source (int): position of initial source of bicoid, must be int, to access array values  
+        source_position (int): position of initial source of bicoid, must be int, to access array values  
         Lx (int): total length of the x coordinate/total length of the egg
         Ttotal (int): total simulation time in seconds
         dtsave (int): time interval for saving data in seconds
